@@ -1,21 +1,31 @@
+// Global npm libraries.
 const express = require('express')
 const cors = require('cors')
-const slpMiddleware = require('./utils/slpMiddleware')
 const PaymentProtocol = require('bitcore-payment-protocol')
-const errorMessages = require('./utils/errorMessages')
 const { Transaction } = require('bitcoincashjs-lib')
-const { getNeededStamps, buildTransaction, splitUtxosIntoStamps } = require('./utils/transaction')
+const BCHJS = require('@chris.troutner/bch-js')
+
+// Local libraries.
+const config = require('./config.json')
+const slpMiddleware = require('./utils/slpMiddleware')
+const errorMessages = require('./utils/errorMessages')
+const {
+  getNeededStamps,
+  buildTransaction,
+  splitUtxosIntoStamps
+} = require('./utils/transaction')
 const {
   fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
   fetchUTXOsForStampGeneration,
   broadcastTransaction
 } = require('./utils/network')
-const BCHJS = require('@chris.troutner/bch-js')
-const config = require('./config.json')
 
 const bchjs = new BCHJS({
-  restURL: config.network === 'mainnet' ? 'https://api.fullstack.cash/v3/' : 'https://tapi.fullstack.cash/v3/',
+  restURL:
+        config.network === 'mainnet'
+          ? 'https://api.fullstack.cash/v3/'
+          : 'https://tapi.fullstack.cash/v3/',
   apiToken: config.apiKey
 })
 
@@ -39,18 +49,27 @@ app.post('/postage', async function (req, res) {
     const hdNode = bchjs.HDNode.fromSeed(rootSeed)
     const keyPair = bchjs.HDNode.toKeyPair(hdNode)
     const payment = PaymentProtocol.Payment.decode(req.raw)
-    const incomingTransaction = Transaction.fromHex(payment.transactions[0].toString('hex'))
+    const incomingTransaction = Transaction.fromHex(
+      payment.transactions[0].toString('hex')
+    )
     await validateSLPInputs(incomingTransaction.ins)
     const neededStampsForTransaction = getNeededStamps(incomingTransaction)
     const stamps = await fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)
     )
-    const stampedTransaction = buildTransaction(incomingTransaction, stamps, keyPair)
+    const stampedTransaction = buildTransaction(
+      incomingTransaction,
+      stamps,
+      keyPair
+    )
     const transactionId = await broadcastTransaction(stampedTransaction)
     const memo = `Transaction Broadcasted: https://explorer.bitcoin.com/bch/tx/${transactionId}`
     payment.transactions[0] = stampedTransaction
-    const paymentAck = paymentProtocol.makePaymentACK({ payment, memo }, 'BCH')
+    const paymentAck = paymentProtocol.makePaymentACK(
+      { payment, memo },
+      'BCH'
+    )
     res.status(200).send(paymentAck.serialize())
   } catch (e) {
     console.error(e)

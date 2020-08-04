@@ -1,6 +1,6 @@
 {
     "name": "simpleledger-post-office-server",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "description": "Trout's fork of the SLP Post Office Server",
     "main": "server.js",
     "scripts": {

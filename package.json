@@ -46,9 +46,7 @@
         "inquirer": "^7.3.2",
         "lodash": "^4.17.19",
         "minimist": "^1.2.5",
-        "touch": "^3.1.0",
-        "ts-node-dev": "^1.0.0-pre.44",
-        "typescript": "^3.7.3"
+        "touch": "^3.1.0"
     },
     "devDependencies": {
         "eslint": "^6.7.2",
@@ -57,7 +55,6 @@
         "eslint-plugin-prettier": "3.1.1",
         "eslint-plugin-standard": "^4.0.1",
         "husky": "3.1.0",
-        "prettier": "1.19.1",
-        "standard": "^14.3.4"
+        "prettier": "1.19.1"
     }
 }

@@ -1,7 +1,7 @@
 {
     "name": "simpleledger-post-office-server",
     "version": "1.0.0",
-    "description": "Trout's fork of the SLP Post Office Server",
+    "description": "PSF fork of the SLP Post Office Server",
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
@@ -13,7 +13,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/christroutner/simpleledger-post-office-server.git"
+        "url": "git+https://github.com/Permissionless-Software-Foundation/simpleledger-post-office-server.git"
     },
     "keywords": [
         "slp",
@@ -29,9 +29,9 @@
     ],
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/christroutner/simpleledger-post-office-server/issues"
+        "url": "https://github.com/Permissionless-Software-Foundation/simpleledger-post-office-server/issues"
     },
-    "homepage": "https://github.com/christroutner/simpleledger-post-office-server#readme",
+    "homepage": "https://github.com/Permissionless-Software-Foundation/simpleledger-post-office-server#readme",
     "dependencies": {
         "@chris.troutner/bch-js": "^3.3.5",
         "bignumber.js": "^9.0.0",
@@ -71,5 +71,10 @@
                 "npmPublish": false
             }
         ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm run lint"
+        }
     }
 }

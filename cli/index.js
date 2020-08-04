@@ -47,7 +47,7 @@ const run = async () => {
     }
   }
 
-  fs.writeFile('config.json', JSON.stringify(configObj), err =>
+  fs.writeFile('config.json', JSON.stringify(configObj, null, 2), err =>
     err ? console.error(err) : console.log('Post Office fully configured')
   )
 }

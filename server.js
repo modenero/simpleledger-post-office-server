@@ -1,33 +1,33 @@
-import express = require('express')
-import cors = require('cors')
-import slpMiddleware from './utils/slpMiddleware'
-import PaymentProtocol from 'bitcore-payment-protocol'
-import errorMessages from './utils/errorMessages'
-import { Transaction } from 'bitcoincashjs-lib'
-import { getNeededStamps, buildTransaction, splitUtxosIntoStamps } from './utils/transaction'
-import {
+const express = require('express')
+const cors = require('cors')
+const slpMiddleware = require('./utils/slpMiddleware')
+const PaymentProtocol = require('bitcore-payment-protocol')
+const errorMessages = require('./utils/errorMessages')
+const { Transaction } = require('bitcoincashjs-lib')
+const { getNeededStamps, buildTransaction, splitUtxosIntoStamps } = require('./utils/transaction')
+const {
     fetchUTXOsForNumberOfStampsNeeded,
     validateSLPInputs,
     fetchUTXOsForStampGeneration,
     broadcastTransaction,
-} from './utils/network'
-import BCHJS from '@chris.troutner/bch-js'
-import config from './config.json'
+} = require('./utils/network')
+const BCHJS = require('@chris.troutner/bch-js')
+const config = require('./config.json')
 
 const bchjs = new BCHJS({
     restURL: config.network === 'mainnet' ? 'https://api.fullstack.cash/v3/' : 'https://tapi.fullstack.cash/v3/',
     apiToken: config.apiKey,
 })
 
-const app: express.Application = express()
+const app = express()
 app.use(cors())
 app.use(slpMiddleware)
 
-app.get('/postage', function(req: express.Request, res: express.Response): void {
+app.get('/postage', function(req, res) {
     res.send(config.postageRate)
 })
 
-app.post('/postage', async function(req: any, res: express.Response) {
+app.post('/postage', async function(req, res) {
     const paymentProtocol = new PaymentProtocol('BCH')
     try {
         if (!req.is('application/simpleledger-payment')) {

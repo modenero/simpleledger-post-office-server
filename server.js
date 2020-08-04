@@ -7,20 +7,21 @@ const BCHJS = require('@chris.troutner/bch-js')
 
 // Local libraries.
 const config = require('./config.json')
-const slpMiddleware = require('./utils/slpMiddleware')
-const errorMessages = require('./utils/errorMessages')
+const slpMiddleware = require('./src/lib/slpMiddleware')
+const errorMessages = require('./src/lib/errorMessages')
 const {
   getNeededStamps,
   buildTransaction,
   splitUtxosIntoStamps
-} = require('./utils/transaction')
+} = require('./src/lib/transaction')
 const {
   fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
   fetchUTXOsForStampGeneration,
   broadcastTransaction
-} = require('./utils/network')
+} = require('./src/lib/network')
 
+// Instantiate bch-js.
 const bchjs = new BCHJS({
   restURL:
         config.network === 'mainnet'

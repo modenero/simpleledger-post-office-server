@@ -6,8 +6,10 @@
     "scripts": {
         "start": "node server.js",
         "config": "node ./cli/index.js",
-        "test": "echo create more tests!",
-        "lint": "standard --env mocha --fix"
+        "test": "npm run lint; echo create more tests!",
+        "lint": "standard --env mocha --fix",
+        "coverage": "nyc report --reporter=text-lcov | coveralls",
+        "coverage:report": "export NETWORK=mainnet && nyc --reporter=html mocha --timeout 25000 test/v3/"
     },
     "repository": {
         "type": "git",

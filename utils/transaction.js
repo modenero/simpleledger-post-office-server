@@ -43,7 +43,7 @@ const addStampsForTransactionAndSignInputs = (
   return transaction
 }
 
-export const getNeededStamps = transaction => {
+const getNeededStamps = transaction => {
   BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_UP })
   const transactionScript = bchjs.Script.toASM(
     transaction.outs[SLP_OP_RETURN_VOUT].script
@@ -97,7 +97,7 @@ export const getNeededStamps = transaction => {
   return neededStamps
 }
 
-export const splitUtxosIntoStamps = (utxos, hdNode) => {
+const splitUtxosIntoStamps = (utxos, hdNode) => {
   const transactionBuilder =
         config.network === 'mainnet'
           ? new bchjs.TransactionBuilder()
@@ -167,7 +167,7 @@ export const splitUtxosIntoStamps = (utxos, hdNode) => {
   return hex
 }
 
-export const buildTransaction = (
+const buildTransaction = (
   incomingTransaction,
   stamps,
   keyPairFromPostOffice
@@ -184,4 +184,10 @@ export const buildTransaction = (
     .build()
     .toHex()
   return newTransactionHex
+}
+
+module.exports = {
+  getNeededStamps,
+  buildTransaction,
+  splitUtxosIntoStamps
 }

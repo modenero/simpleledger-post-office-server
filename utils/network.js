@@ -1,6 +1,6 @@
-import errorMessages from './errorMessages'
-import BCHJS from '@chris.troutner/bch-js'
-import config from '../config.json'
+const errorMessages = require('./errorMessages')
+const BCHJS = require('@chris.troutner/bch-js')
+const config = require('../config.json')
 
 const bchjs = new BCHJS({
   restURL:
@@ -12,7 +12,7 @@ const bchjs = new BCHJS({
 
 // const MIN_BYTES_INPUT = 181
 
-export const fetchUTXOsForStampGeneration = async cashAddress => {
+const fetchUTXOsForStampGeneration = async cashAddress => {
   const utxoResponse = await bchjs.Electrumx.utxo(cashAddress)
   const utxos = utxoResponse.utxos.filter(
     utxo => utxo.value > config.postageRate.weight * 2
@@ -23,7 +23,7 @@ export const fetchUTXOsForStampGeneration = async cashAddress => {
   return utxos
 }
 
-export const fetchUTXOsForNumberOfStampsNeeded = async (
+const fetchUTXOsForNumberOfStampsNeeded = async (
   numberOfStamps,
   cashAddress
 ) => {
@@ -44,7 +44,7 @@ export const fetchUTXOsForNumberOfStampsNeeded = async (
   return stamps.slice(0, numberOfStamps)
 }
 
-export const validateSLPInputs = async inputs => {
+const validateSLPInputs = async inputs => {
   const txIds = inputs.map(input => {
     const hash = Buffer.from(input.hash)
     return hash.reverse().toString('hex')
@@ -55,11 +55,18 @@ export const validateSLPInputs = async inputs => {
   })
 }
 
-export const broadcastTransaction = async rawTransactionHex => {
+const broadcastTransaction = async rawTransactionHex => {
   console.log('Broadcasting transaction...')
   const transactionId = await bchjs.RawTransactions.sendRawTransaction(
     rawTransactionHex
   )
   console.log(`https://explorer.bitcoin.com/bch/tx/${transactionId}`)
   return transactionId
+}
+
+module.exports = {
+  fetchUTXOsForNumberOfStampsNeeded,
+  validateSLPInputs,
+  fetchUTXOsForStampGeneration,
+  broadcastTransaction
 }

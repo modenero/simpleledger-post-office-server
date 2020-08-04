@@ -4,10 +4,9 @@
     "description": "Trout's fork of the SLP Post Office Server",
     "main": "server.js",
     "scripts": {
-        "start": "ts-node-dev --respawn --transpileOnly ./server.ts",
-        "start:production": "tsc && node ./build/server.js",
-        "cli": "node ./cli/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js",
+        "config": "node ./cli/index.js",
+        "test": "echo create more tests!",
         "lint": "standard --env mocha --fix"
     },
     "repository": {

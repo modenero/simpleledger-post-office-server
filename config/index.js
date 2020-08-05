@@ -14,6 +14,9 @@ const defaultConfig = require('./server-settings/default.json')
 let serverConfig = {}
 try {
   serverConfig = require('./server-settings/server-config.json')
-} catch (err) {}
+  console.log('server-config.json found. Using settings in this file.')
+} catch (err) {
+  console.log('Could not open server-config.json. Using default server settings.')
+}
 
 module.exports = Object.assign({}, common, envConfig, defaultConfig, serverConfig)

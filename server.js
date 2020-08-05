@@ -6,21 +6,22 @@ const { Transaction } = require('bitcoincashjs-lib')
 const BCHJS = require('@chris.troutner/bch-js')
 
 // Local libraries.
-const config = require('./config.json')
-const slpMiddleware = require('./utils/slpMiddleware')
-const errorMessages = require('./utils/errorMessages')
+const config = require('./config')
+const slpMiddleware = require('./src/lib/slpMiddleware')
+const errorMessages = require('./src/lib/errorMessages')
 const {
   getNeededStamps,
   buildTransaction,
   splitUtxosIntoStamps
-} = require('./utils/transaction')
+} = require('./src/lib/transaction')
 const {
   fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
   fetchUTXOsForStampGeneration,
   broadcastTransaction
-} = require('./utils/network')
+} = require('./src/lib/network')
 
+// Instantiate bch-js.
 const bchjs = new BCHJS({
   restURL:
         config.network === 'mainnet'
@@ -29,6 +30,7 @@ const bchjs = new BCHJS({
   apiToken: config.apiKey
 })
 
+// Instantiate express.
 const app = express()
 app.use(cors())
 app.use(slpMiddleware)
@@ -81,6 +83,7 @@ app.post('/postage', async function (req, res) {
   }
 })
 
+// Start the server.
 app.listen(3000, async () => {
   const rootSeed = await bchjs.Mnemonic.toSeed(config.mnemonic)
   const hdNode = bchjs.HDNode.fromSeed(rootSeed)

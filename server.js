@@ -6,7 +6,7 @@ const { Transaction } = require('bitcoincashjs-lib')
 const BCHJS = require('@chris.troutner/bch-js')
 
 // Local libraries.
-const config = require('./config.json')
+const config = require('./config')
 const slpMiddleware = require('./src/lib/slpMiddleware')
 const errorMessages = require('./src/lib/errorMessages')
 const {

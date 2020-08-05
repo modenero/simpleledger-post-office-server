@@ -30,6 +30,7 @@ const bchjs = new BCHJS({
   apiToken: config.apiKey
 })
 
+// Instantiate express.
 const app = express()
 app.use(cors())
 app.use(slpMiddleware)
@@ -82,6 +83,7 @@ app.post('/postage', async function (req, res) {
   }
 })
 
+// Start the server.
 app.listen(3000, async () => {
   const rootSeed = await bchjs.Mnemonic.toSeed(config.mnemonic)
   const hdNode = bchjs.HDNode.fromSeed(rootSeed)

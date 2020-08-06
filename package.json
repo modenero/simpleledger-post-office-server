@@ -2,9 +2,9 @@
     "name": "simpleledger-post-office-server",
     "version": "1.0.0",
     "description": "PSF fork of the SLP Post Office Server",
-    "main": "server.js",
+    "main": "post-office.js",
     "scripts": {
-        "start": "node server.js",
+        "start": "node post-office.js",
         "config": "node ./cli/index.js",
         "test": "npm run lint; nyc --reporter=text mocha --timeout=15000 test/unit/",
         "test:integration": "mocha --timeout=30000 test/integration/",

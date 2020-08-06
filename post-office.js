@@ -35,10 +35,15 @@ const app = express()
 app.use(cors())
 app.use(slpMiddleware)
 
+// GET endpoint allows wallets to query the post office settings.
 app.get('/postage', function (req, res) {
   res.send(config.postageRate)
 })
+app.get('/', function (req, res) {
+  res.send(config.postageRate)
+})
 
+// POST endpoint is used to apply postage stamps to transactions.
 app.post('/postage', async function (req, res) {
   const paymentProtocol = new PaymentProtocol('BCH')
   try {

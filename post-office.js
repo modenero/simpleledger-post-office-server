@@ -14,12 +14,15 @@ const {
   buildTransaction,
   splitUtxosIntoStamps
 } = require('./src/lib/transaction')
+
 const {
   fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
-  fetchUTXOsForStampGeneration,
-  broadcastTransaction
+  // fetchUTXOsForStampGeneration,
+  broadcastTransaction,
+  Network
 } = require('./src/lib/network')
+const network = new Network()
 
 // Instantiate bch-js.
 const bchjs = new BCHJS({
@@ -97,7 +100,7 @@ app.listen(3000, async () => {
   const generateStamps = async () => {
     console.log('Generating stamps...')
     try {
-      const utxosToSplit = await fetchUTXOsForStampGeneration(cashAddress)
+      const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
       const splitTransaction = splitUtxosIntoStamps(utxosToSplit, hdNode)
       await broadcastTransaction(splitTransaction)
     } catch (e) {

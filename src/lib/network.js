@@ -34,25 +34,6 @@ class Network {
   }
 }
 
-// const MIN_BYTES_INPUT = 181
-
-const fetchUTXOsForStampGeneration = async cashAddress => {
-  // Get UTXOs for the post office wallet.
-  const utxoResponse = await bchjs.Electrumx.utxo(cashAddress)
-
-  // Get UTXOs that are big enough to split into dust (stamps).
-  const utxos = utxoResponse.utxos.filter(
-    utxo => utxo.value > config.postageRate.weight * 2
-  )
-
-  // Exit if there are UTXOs to split.
-  if (utxos.length <= 0) {
-    throw new Error('Insufficient Balance for Stamp Generation')
-  }
-
-  return utxos
-}
-
 const fetchUTXOsForNumberOfStampsNeeded = async (
   numberOfStamps,
   cashAddress
@@ -97,7 +78,6 @@ const broadcastTransaction = async rawTransactionHex => {
 module.exports = {
   fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
-  fetchUTXOsForStampGeneration,
   broadcastTransaction,
   Network
 }

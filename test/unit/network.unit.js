@@ -67,10 +67,5 @@ describe('#network.js', () => {
         )
       }
     })
-
-    // Finish creating this unit test.
-    it('should ignore UTXOs of 700 sats', async () => {
-      console.log('This test needs to be created.')
-    })
   })
 })

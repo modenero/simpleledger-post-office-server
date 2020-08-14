@@ -52,17 +52,17 @@ class Network {
     }
     return stamps.slice(0, numberOfStamps)
   }
-}
 
-const validateSLPInputs = async inputs => {
-  const txIds = inputs.map(input => {
-    const hash = Buffer.from(input.hash)
-    return hash.reverse().toString('hex')
-  })
-  const validateResponse = await bchjs.SLP.Utils.validateTxid(txIds)
-  validateResponse.forEach(response => {
-    if (!response.valid) throw new Error(errorMessages.INVALID_PAYMENT)
-  })
+  async validateSLPInputs (inputs) {
+    const txIds = inputs.map(input => {
+      const hash = Buffer.from(input.hash)
+      return hash.reverse().toString('hex')
+    })
+    const validateResponse = await this.bchjs.SLP.Utils.validateTxid(txIds)
+    validateResponse.forEach(response => {
+      if (!response.valid) throw new Error(errorMessages.INVALID_PAYMENT)
+    })
+  }
 }
 
 const broadcastTransaction = async rawTransactionHex => {
@@ -75,7 +75,6 @@ const broadcastTransaction = async rawTransactionHex => {
 }
 
 module.exports = {
-  validateSLPInputs,
   broadcastTransaction,
   Network
 }

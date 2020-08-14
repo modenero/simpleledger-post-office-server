@@ -16,7 +16,6 @@ const {
 } = require('./src/lib/transaction')
 
 const {
-  validateSLPInputs,
   // fetchUTXOsForStampGeneration,
   broadcastTransaction,
   Network
@@ -61,7 +60,7 @@ app.post('/postage', async function (req, res) {
     const incomingTransaction = Transaction.fromHex(
       payment.transactions[0].toString('hex')
     )
-    await validateSLPInputs(incomingTransaction.ins)
+    await network.validateSLPInputs(incomingTransaction.ins)
     const neededStampsForTransaction = getNeededStamps(incomingTransaction)
     const stamps = await network.fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,

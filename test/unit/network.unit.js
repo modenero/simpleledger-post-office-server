@@ -68,4 +68,47 @@ describe('#network.js', () => {
       }
     })
   })
+
+  describe('#fetchUTXOsForNumberOfStampsNeeded', () => {
+    it('should return stamp', async () => {
+      const addr =
+                'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+
+      // Mock network calls.
+      sandbox
+        .stub(uut.bchjs.Electrumx, 'utxo')
+        .resolves(mockData.mockUtxo)
+      sandbox
+        .stub(uut.bchjs.SLP.Utils, 'validateTxid')
+        .resolves(mockData.invalidSingleSLPValidateTxidResponse)
+
+      const result = await uut.fetchUTXOsForNumberOfStampsNeeded(1, addr)
+      assert.equal(result.length, 1)
+    })
+
+    it('should throw and error if there are not enough stamps', async () => {
+      try {
+        const addr =
+                  'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+
+        // Mock network calls.
+        sandbox
+          .stub(uut.bchjs.Electrumx, 'utxo')
+          .resolves(mockData.mockUtxo)
+        sandbox
+          .stub(uut.bchjs.SLP.Utils, 'validateTxid')
+          .resolves(mockData.invalidSingleSLPValidateTxidResponse)
+
+        await uut.fetchUTXOsForNumberOfStampsNeeded(2, addr)
+
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        // console.log('err: ', err)
+        assert.include(
+          err.message,
+          'Stamps currently unavailable. In need of refill'
+        )
+      }
+    })
+  })
 })

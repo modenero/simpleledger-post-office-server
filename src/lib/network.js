@@ -32,27 +32,26 @@ class Network {
 
     return utxos
   }
-}
 
-const fetchUTXOsForNumberOfStampsNeeded = async (
-  numberOfStamps,
-  cashAddress
-) => {
-  const utxoResponse = await bchjs.Electrumx.utxo(cashAddress)
-  const txIds = utxoResponse.utxos
-    .map(utxo => utxo.tx_hash)
-    .splice(0, numberOfStamps)
-  const areSlpUtxos = await bchjs.SLP.Utils.validateTxid(txIds)
-  const filteredTxIds = areSlpUtxos
-    .filter(tokenUtxo => tokenUtxo.valid === false)
-    .map(tokenUtxo => tokenUtxo.txid)
-  const stamps = utxoResponse.utxos.filter(utxo =>
-    filteredTxIds.includes(utxo.tx_hash)
-  )
-  if (stamps.length < numberOfStamps) {
-    throw new Error(errorMessages.UNAVAILABLE_STAMPS)
+  async fetchUTXOsForNumberOfStampsNeeded (numberOfStamps, cashAddress) {
+    const utxoResponse = await this.bchjs.Electrumx.utxo(cashAddress)
+    const txIds = utxoResponse.utxos
+      .map(utxo => utxo.tx_hash)
+      .splice(0, numberOfStamps)
+
+    // Find SLP UTXOs, making sure not to spend them.
+    const areSlpUtxos = await this.bchjs.SLP.Utils.validateTxid(txIds)
+    const filteredTxIds = areSlpUtxos
+      .filter(tokenUtxo => tokenUtxo.valid === false)
+      .map(tokenUtxo => tokenUtxo.txid)
+    const stamps = utxoResponse.utxos.filter(utxo =>
+      filteredTxIds.includes(utxo.tx_hash)
+    )
+    if (stamps.length < numberOfStamps) {
+      throw new Error(errorMessages.UNAVAILABLE_STAMPS)
+    }
+    return stamps.slice(0, numberOfStamps)
   }
-  return stamps.slice(0, numberOfStamps)
 }
 
 const validateSLPInputs = async inputs => {
@@ -76,7 +75,6 @@ const broadcastTransaction = async rawTransactionHex => {
 }
 
 module.exports = {
-  fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
   broadcastTransaction,
   Network

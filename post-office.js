@@ -16,7 +16,6 @@ const {
 } = require('./src/lib/transaction')
 
 const {
-  fetchUTXOsForNumberOfStampsNeeded,
   validateSLPInputs,
   // fetchUTXOsForStampGeneration,
   broadcastTransaction,
@@ -64,7 +63,7 @@ app.post('/postage', async function (req, res) {
     )
     await validateSLPInputs(incomingTransaction.ins)
     const neededStampsForTransaction = getNeededStamps(incomingTransaction)
-    const stamps = await fetchUTXOsForNumberOfStampsNeeded(
+    const stamps = await network.fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)
     )

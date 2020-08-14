@@ -20,7 +20,15 @@ const emptyUtxo = {
   utxos: []
 }
 
+const invalidSingleSLPValidateTxidResponse = [
+  {
+    txid: 'd5228d2cdc77fbe5a9aa79f19b0933b6802f9f0067f42847fc4fe343664723e5',
+    valid: false
+  }
+]
+
 module.exports = {
   mockUtxo,
-  emptyUtxo
+  emptyUtxo,
+  invalidSingleSLPValidateTxidResponse
 }

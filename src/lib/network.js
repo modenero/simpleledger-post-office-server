@@ -63,18 +63,15 @@ class Network {
       if (!response.valid) throw new Error(errorMessages.INVALID_PAYMENT)
     })
   }
+
+  async broadcastTransaction (rawTransactionHex) {
+    console.log('Broadcasting transaction...')
+    const transactionId = await this.bchjs.RawTransactions.sendRawTransaction(
+      rawTransactionHex
+    )
+    console.log(`https://explorer.bitcoin.com/bch/tx/${transactionId}`)
+    return transactionId
+  }
 }
 
-const broadcastTransaction = async rawTransactionHex => {
-  console.log('Broadcasting transaction...')
-  const transactionId = await bchjs.RawTransactions.sendRawTransaction(
-    rawTransactionHex
-  )
-  console.log(`https://explorer.bitcoin.com/bch/tx/${transactionId}`)
-  return transactionId
-}
-
-module.exports = {
-  broadcastTransaction,
-  Network
-}
+module.exports = Network

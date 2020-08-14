@@ -15,11 +15,7 @@ const {
   splitUtxosIntoStamps
 } = require('./src/lib/transaction')
 
-const {
-  // fetchUTXOsForStampGeneration,
-  broadcastTransaction,
-  Network
-} = require('./src/lib/network')
+const Network = require('./src/lib/network')
 const network = new Network()
 
 // Instantiate bch-js.
@@ -71,7 +67,7 @@ app.post('/postage', async function (req, res) {
       stamps,
       keyPair
     )
-    const transactionId = await broadcastTransaction(stampedTransaction)
+    const transactionId = await network.broadcastTransaction(stampedTransaction)
     const memo = `Transaction Broadcasted: https://explorer.bitcoin.com/bch/tx/${transactionId}`
     payment.transactions[0] = stampedTransaction
     const paymentAck = paymentProtocol.makePaymentACK(
@@ -100,7 +96,7 @@ app.listen(3000, async () => {
     try {
       const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
       const splitTransaction = splitUtxosIntoStamps(utxosToSplit, hdNode)
-      await broadcastTransaction(splitTransaction)
+      await network.broadcastTransaction(splitTransaction)
     } catch (e) {
       console.error(e.message || e.error || e)
     }

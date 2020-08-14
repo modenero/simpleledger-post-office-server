@@ -5,7 +5,7 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const { Network } = require('../../src/lib/network')
+const Network = require('../../src/lib/network')
 const mockData = require('../mocks/network.mocks.js')
 
 describe('#network.js', () => {
@@ -154,6 +154,20 @@ describe('#network.js', () => {
           'Invalid Payment'
         )
       }
+    })
+  })
+
+  describe('#broadcastTransaction', () => {
+    it('should return a transaction id for the broadcasted transaction', async () => {
+      const mockTransactionId = 'fe28050b93faea61fa88c4c630f0e1f0a1c24d0082dd0e10d369e13212128f33'
+
+      // Mock network calls.
+      sandbox
+        .stub(uut.bchjs.RawTransactions, 'sendRawTransaction')
+        .resolves(mockTransactionId)
+
+      const returnedTransactionID = await uut.broadcastTransaction('')
+      assert.equal(returnedTransactionID, mockTransactionId)
     })
   })
 })

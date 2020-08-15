@@ -4,7 +4,7 @@
 
 const assert = require('chai').assert
 
-const { Network } = require('../../src/lib/network')
+const Network = require('../../src/lib/network')
 const uut = new Network()
 
 describe('#network.js', () => {
@@ -43,6 +43,33 @@ describe('#network.js', () => {
         assert.include(
           err.message,
           'Insufficient Balance for Stamp Generation'
+        )
+      }
+    })
+  })
+
+  describe('#fetchUTXOsForNumberOfStampsNeeded', () => {
+    it('should return stamp', async () => {
+      const addr =
+                'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+
+      const result = await uut.fetchUTXOsForNumberOfStampsNeeded(1, addr)
+      assert.equal(result.length, 1)
+    })
+
+    it('should throw and error if there are not enough stamps', async () => {
+      try {
+        const addr =
+                  'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+
+        await uut.fetchUTXOsForNumberOfStampsNeeded(2, addr)
+
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        // console.log('err: ', err)
+        assert.include(
+          err.message,
+          'Stamps currently unavailable. In need of refill'
         )
       }
     })

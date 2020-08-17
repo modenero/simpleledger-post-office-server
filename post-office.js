@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
 const { Transaction } = require('bitcoincashjs-lib')
-const BCHJS = require('@chris.troutner/bch-js')
+const BCHJS = require('@psf/bch-js')
 
 // Local libraries.
 const config = require('./config')

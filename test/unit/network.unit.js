@@ -89,7 +89,7 @@ describe('#network.js', () => {
     it('should throw and error if there are not enough stamps', async () => {
       try {
         const addr =
-                  'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+                    'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
 
         // Mock network calls.
         sandbox
@@ -149,17 +149,15 @@ describe('#network.js', () => {
         assert.equal(true, false, 'Unexpected result!')
       } catch (err) {
         // console.log('err: ', err)
-        assert.include(
-          err.message,
-          'Invalid Payment'
-        )
+        assert.include(err.message, 'Invalid Payment')
       }
     })
   })
 
   describe('#broadcastTransaction', () => {
     it('should return a transaction id for the broadcasted transaction', async () => {
-      const mockTransactionId = 'fe28050b93faea61fa88c4c630f0e1f0a1c24d0082dd0e10d369e13212128f33'
+      const mockTransactionId =
+                'fe28050b93faea61fa88c4c630f0e1f0a1c24d0082dd0e10d369e13212128f33'
 
       // Mock network calls.
       sandbox

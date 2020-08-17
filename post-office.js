@@ -67,7 +67,9 @@ app.post('/postage', async function (req, res) {
       stamps,
       keyPair
     )
-    const transactionId = await network.broadcastTransaction(stampedTransaction)
+    const transactionId = await network.broadcastTransaction(
+      stampedTransaction
+    )
     const memo = `Transaction Broadcasted: https://explorer.bitcoin.com/bch/tx/${transactionId}`
     payment.transactions[0] = stampedTransaction
     const paymentAck = paymentProtocol.makePaymentACK(
@@ -94,7 +96,9 @@ app.listen(3000, async () => {
   const generateStamps = async () => {
     console.log('Generating stamps...')
     try {
-      const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
+      const utxosToSplit = await network.fetchUTXOsForStampGeneration(
+        cashAddress
+      )
       const splitTransaction = splitUtxosIntoStamps(utxosToSplit, hdNode)
       await network.broadcastTransaction(splitTransaction)
     } catch (e) {

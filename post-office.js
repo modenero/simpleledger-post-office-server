@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
 const { Transaction } = require('bitcoincashjs-lib')
-const BCHJS = require('@chris.troutner/bch-js')
+const BCHJS = require('@psf/bch-js')
 
 // Local libraries.
 const config = require('./config')
@@ -15,13 +15,7 @@ const {
   splitUtxosIntoStamps
 } = require('./src/lib/transaction')
 
-const {
-  fetchUTXOsForNumberOfStampsNeeded,
-  validateSLPInputs,
-  // fetchUTXOsForStampGeneration,
-  broadcastTransaction,
-  Network
-} = require('./src/lib/network')
+const Network = require('./src/lib/network')
 const network = new Network()
 
 // Instantiate bch-js.
@@ -62,9 +56,9 @@ app.post('/postage', async function (req, res) {
     const incomingTransaction = Transaction.fromHex(
       payment.transactions[0].toString('hex')
     )
-    await validateSLPInputs(incomingTransaction.ins)
+    await network.validateSLPInputs(incomingTransaction.ins)
     const neededStampsForTransaction = getNeededStamps(incomingTransaction)
-    const stamps = await fetchUTXOsForNumberOfStampsNeeded(
+    const stamps = await network.fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)
     )
@@ -73,7 +67,9 @@ app.post('/postage', async function (req, res) {
       stamps,
       keyPair
     )
-    const transactionId = await broadcastTransaction(stampedTransaction)
+    const transactionId = await network.broadcastTransaction(
+      stampedTransaction
+    )
     const memo = `Transaction Broadcasted: https://explorer.bitcoin.com/bch/tx/${transactionId}`
     payment.transactions[0] = stampedTransaction
     const paymentAck = paymentProtocol.makePaymentACK(
@@ -100,9 +96,11 @@ app.listen(3000, async () => {
   const generateStamps = async () => {
     console.log('Generating stamps...')
     try {
-      const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
+      const utxosToSplit = await network.fetchUTXOsForStampGeneration(
+        cashAddress
+      )
       const splitTransaction = splitUtxosIntoStamps(utxosToSplit, hdNode)
-      await broadcastTransaction(splitTransaction)
+      await network.broadcastTransaction(splitTransaction)
     } catch (e) {
       console.error(e.message || e.error || e)
     }

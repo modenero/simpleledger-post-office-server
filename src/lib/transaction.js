@@ -17,30 +17,32 @@ const LOKAD_ID_INDEX_VALUE = '534c5000'
 const MIN_BYTES_INPUT = 181
 const TOKEN_ID_INDEX = 4
 
-const addStampsForTransactionAndSignInputs = (
-  transaction,
-  keyPairFromPostOffice,
-  stamps
-) => {
-  const lastSlpInputVin = transaction.inputs.length - 1
-  for (let i = 0; i < stamps.length; i++) {
-    transaction.addInput(stamps[i].tx_hash, stamps[i].tx_pos)
+class Transaction {
+  constructor () {
+    this.bchjs = bchjs
   }
 
-  for (let i = lastSlpInputVin + 1; i <= stamps.length; i++) {
-    let redeemScript
-    console.log('Signing...', i)
-    transaction.sign(
-      i,
-      keyPairFromPostOffice,
-      redeemScript,
-      0x01, // SIGHASH_ALL
-      config.postageRate.weight + MIN_BYTES_INPUT,
-      ECSignature.ECDSA
-    )
-  }
+  addStampsForTransactionAndSignInputs (transaction, keyPairFromPostOffice, stamps) {
+    const lastSlpInputVin = transaction.inputs.length - 1
+    for (let i = 0; i < stamps.length; i++) {
+      transaction.addInput(stamps[i].tx_hash, stamps[i].tx_pos)
+    }
 
-  return transaction
+    for (let i = lastSlpInputVin + 1; i <= stamps.length; i++) {
+      let redeemScript
+      console.log('Signing...', i)
+      transaction.sign(
+        i,
+        keyPairFromPostOffice,
+        redeemScript,
+        0x01, // SIGHASH_ALL
+        config.postageRate.weight + MIN_BYTES_INPUT,
+        ECSignature.ECDSA
+      )
+    }
+
+    return transaction
+  }
 }
 
 const getNeededStamps = transaction => {
@@ -187,6 +189,7 @@ const buildTransaction = (
 }
 
 module.exports = {
+  Transaction,
   getNeededStamps,
   buildTransaction,
   splitUtxosIntoStamps

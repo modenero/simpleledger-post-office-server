@@ -38,7 +38,115 @@ const stampsMock = [
   }
 ]
 
+const invalidSLPOPReturnTxMock = {
+  version: 2,
+  locktime: 0,
+  ins: [],
+  outs: [
+    {
+      value: 0,
+      script: Buffer.from( // invalid lokad id index value
+        '6a04534c5001510453454e44204de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf0800000022ecb25c000800007eb55317a5b2',
+        'hex'
+      )
+    }
+  ]
+}
+
+const validSLPOPReturnTxWithNoPaymentToServerMock = {
+  version: 2,
+  locktime: 0,
+  ins: [],
+  outs: [
+    {
+      value: 0,
+      script: Buffer.from(
+        '6a04534c500001010453454e44204de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf0800000022ecb25c000800007eb55317a5b2',
+        'hex'
+      )
+    },
+    {
+      value: 0,
+      script: Buffer.from(
+        '76a9147f79ad91bf688c62d545c4ca1c8cb1d704caf3dd88ac',
+        'hex'
+      )
+    }
+  ]
+}
+
+const unsupportedTokenTxMock = {
+  version: 2,
+  locktime: 0,
+  ins: [],
+  outs: [
+    {
+      value: 0,
+      script: Buffer.from(
+        '6a04534c500001010453454e44204de69e374a8ed21cbddd47f2338cc0f479dc58daa2bbe11cd604ca488eca0ddf0800000022ecb25c000800007eb55317a5b2',
+        'hex'
+      )
+    },
+    {
+      value: 0,
+      script: Buffer.from(
+        '76a91495ee39ad723020d9887e4132677fe827fe9bd46788ac',
+        'hex'
+      )
+    }
+  ]
+}
+
+const supportedTokenTxWithInsufficientPostagePaymentMock = {
+  version: 2,
+  locktime: 0,
+  ins: [],
+  outs: [
+    {
+      value: 0,
+      script: Buffer.from(
+        '6a04534c5000510453454e442038e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b001160800007eb55317a5b2',
+        'hex'
+      )
+    },
+    {
+      value: 0,
+      script: Buffer.from(
+        '76a91495ee39ad723020d9887e4132677fe827fe9bd46788ac',
+        'hex'
+      )
+    }
+  ]
+}
+
+const validSLPTxWithSufficiantPaymentToServerMock = {
+  version: 2,
+  locktime: 0,
+  ins: [],
+  outs: [
+    {
+      value: 0,
+      script: Buffer.from(
+        '6a04534c5000510453454e442038e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b00800000022ecb25c000800007eb55317a5b2',
+        'hex'
+      )
+    },
+    {
+      value: 0,
+      script: Buffer.from(
+        '76a91495ee39ad723020d9887e4132677fe827fe9bd46788ac',
+        'hex'
+      )
+    }
+  ]
+}
+
 module.exports = {
   transactionMock,
-  stampsMock
+  stampsMock,
+  invalidSLPOPReturnTxMock,
+  validSLPOPReturnTxWithNoPaymentToServerMock,
+  unsupportedTokenTxMock,
+  supportedTokenTxWithInsufficientPostagePaymentMock,
+  validSLPTxWithSufficiantPaymentToServerMock
 }

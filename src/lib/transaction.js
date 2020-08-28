@@ -18,7 +18,8 @@ const MIN_BYTES_INPUT = 181
 const TOKEN_ID_INDEX = 4
 
 class Transaction {
-  constructor () {
+  constructor (config) {
+    this.config = config
     this.bchjs = bchjs
   }
 
@@ -36,67 +37,67 @@ class Transaction {
         keyPairFromPostOffice,
         redeemScript,
         0x01, // SIGHASH_ALL
-        config.postageRate.weight + MIN_BYTES_INPUT,
+        this.config.postageRate.weight + MIN_BYTES_INPUT,
         ECSignature.ECDSA
       )
     }
 
     return transaction
   }
-}
 
-const getNeededStamps = transaction => {
-  BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_UP })
-  const transactionScript = bchjs.Script.toASM(
-    transaction.outs[SLP_OP_RETURN_VOUT].script
-  ).split(' ')
-  if (transactionScript[LOKAD_ID_INDEX] !== LOKAD_ID_INDEX_VALUE) {
-    throw new Error(errorMessages.INVALID_SLP_OP_RETURN)
-  }
-
-  let neededStamps = 0
-  let tokenOutputPostage = 0
-  for (let i = 1; i < transaction.outs.length; i++) {
-    const addressFromOut = bchjs.SLP.Address.toSLPAddress(
-      bchjs.Address.fromOutputScript(transaction.outs[i].script)
-    )
-    const postOfficeAddress = config.postageRate.address
-    if (postOfficeAddress === addressFromOut) {
-      tokenOutputPostage = TOKEN_ID_INDEX + i
+  getNeededStamps (transaction) {
+    BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_UP })
+    const transactionScript = this.bchjs.Script.toASM(
+      transaction.outs[SLP_OP_RETURN_VOUT].script
+    ).split(' ')
+    if (transactionScript[LOKAD_ID_INDEX] !== LOKAD_ID_INDEX_VALUE) {
+      throw new Error(errorMessages.INVALID_SLP_OP_RETURN)
     }
-  }
-  if (tokenOutputPostage === 0) {
-    throw new Error(errorMessages.INSUFFICIENT_POSTAGE)
-  }
 
-  // Check if token being spent is the same as described in the postage rate for the stamp
-  // Check if postage is being paid accordingly
-  const postagePaymentTokenId = transactionScript[TOKEN_ID_INDEX]
-  const stampDetails =
-        config.postageRate.stamps
-          .filter(stamp => stamp.tokenId === postagePaymentTokenId)
-          .pop() || false
-  const minimumStampsNeeded =
-        transaction.outs.length - transaction.ins.length + 1
-  if (stampDetails) {
-    const stampRate = new BigNumber(stampDetails.rate).times(
-      10 ** stampDetails.decimals
-    )
-    const amountPostagePaid = new BigNumber(
-      transactionScript[tokenOutputPostage],
-      16
-    ).times(10 ** stampDetails.decimals)
-    if (
-      amountPostagePaid.isLessThan(stampRate.times(minimumStampsNeeded))
-    ) {
+    let neededStamps = 0
+    let tokenOutputPostage = 0
+    for (let i = 1; i < transaction.outs.length; i++) {
+      const addressFromOut = this.bchjs.SLP.Address.toSLPAddress(
+        this.bchjs.Address.fromOutputScript(transaction.outs[i].script)
+      )
+      const postOfficeAddress = this.config.postageRate.address
+      if (postOfficeAddress === addressFromOut) {
+        tokenOutputPostage = TOKEN_ID_INDEX + i
+      }
+    }
+    if (tokenOutputPostage === 0) {
       throw new Error(errorMessages.INSUFFICIENT_POSTAGE)
     }
-    neededStamps = Number(amountPostagePaid.dividedBy(stampRate).toFixed(0))
-  } else {
-    throw new Error(errorMessages.UNSUPPORTED_SLP_TOKEN)
-  }
 
-  return neededStamps
+    // Check if token being spent is the same as described in the postage rate for the stamp
+    // Check if postage is being paid accordingly
+    const postagePaymentTokenId = transactionScript[TOKEN_ID_INDEX]
+    const stampDetails =
+          this.config.postageRate.stamps
+            .filter(stamp => stamp.tokenId === postagePaymentTokenId)
+            .pop() || false
+    const minimumStampsNeeded =
+          transaction.outs.length - transaction.ins.length + 1
+    if (stampDetails) {
+      const stampRate = new BigNumber(stampDetails.rate).times(
+        10 ** stampDetails.decimals
+      )
+      const amountPostagePaid = new BigNumber(
+        transactionScript[tokenOutputPostage],
+        16
+      ).times(10 ** stampDetails.decimals)
+      if (
+        amountPostagePaid.isLessThan(stampRate.times(minimumStampsNeeded))
+      ) {
+        throw new Error(errorMessages.INSUFFICIENT_POSTAGE)
+      }
+      neededStamps = Number(amountPostagePaid.dividedBy(stampRate).toFixed(0))
+    } else {
+      throw new Error(errorMessages.UNSUPPORTED_SLP_TOKEN)
+    }
+
+    return neededStamps
+  }
 }
 
 const splitUtxosIntoStamps = (utxos, hdNode) => {
@@ -190,7 +191,6 @@ const buildTransaction = (
 
 module.exports = {
   Transaction,
-  getNeededStamps,
   buildTransaction,
   splitUtxosIntoStamps
 }

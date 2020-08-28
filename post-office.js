@@ -2,18 +2,20 @@
 const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
-const { Transaction } = require('bitcoincashjs-lib')
+const { BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
 const BCHJS = require('@chris.troutner/bch-js')
 
 // Local libraries.
 const config = require('./config')
 const slpMiddleware = require('./src/lib/slpMiddleware')
 const errorMessages = require('./src/lib/errorMessages')
+
 const {
-  getNeededStamps,
+  Transaction,
   buildTransaction,
   splitUtxosIntoStamps
 } = require('./src/lib/transaction')
+const transaction = new Transaction(config)
 
 const Network = require('./src/lib/network')
 const network = new Network()
@@ -53,11 +55,11 @@ app.post('/postage', async function (req, res) {
     const hdNode = bchjs.HDNode.fromSeed(rootSeed)
     const keyPair = bchjs.HDNode.toKeyPair(hdNode)
     const payment = PaymentProtocol.Payment.decode(req.raw)
-    const incomingTransaction = Transaction.fromHex(
+    const incomingTransaction = BitcoinCashJSTransaction.fromHex(
       payment.transactions[0].toString('hex')
     )
     await network.validateSLPInputs(incomingTransaction.ins)
-    const neededStampsForTransaction = getNeededStamps(incomingTransaction)
+    const neededStampsForTransaction = transaction.getNeededStamps(incomingTransaction)
     const stamps = await network.fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)

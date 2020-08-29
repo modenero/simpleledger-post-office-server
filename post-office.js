@@ -12,8 +12,7 @@ const errorMessages = require('./src/lib/errorMessages')
 
 const {
   Transaction,
-  buildTransaction,
-  splitUtxosIntoStamps
+  buildTransaction
 } = require('./src/lib/transaction')
 const transaction = new Transaction(config)
 
@@ -97,7 +96,7 @@ app.listen(3000, async () => {
     console.log('Generating stamps...')
     try {
       const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
-      const splitTransaction = splitUtxosIntoStamps(utxosToSplit, hdNode)
+      const splitTransaction = transaction.splitUtxosIntoStamps(utxosToSplit, hdNode)
       await network.broadcastTransaction(splitTransaction)
     } catch (e) {
       console.error(e.message || e.error || e)

@@ -86,4 +86,29 @@ describe('#transaction.js', () => {
       assert.equal(neededStamps, 150000)
     })
   })
+
+  describe('#splitUtxosIntoStamps', () => {
+    it('should raise an error on providing empty utxo list', async () => {
+      try {
+        const rootSeed = await transaction.bchjs.Mnemonic.toSeed(config.mnemonic)
+        const hdNode = transaction.bchjs.HDNode.fromSeed(rootSeed)
+
+        transaction.splitUtxosIntoStamps([], hdNode)
+        assert.equal(true, false, 'Unexpected result!')
+      } catch (err) {
+        // console.log(err.message)
+        assert.include(
+          err.message,
+          'Transaction has no inputs'
+        )
+      }
+    })
+
+    it('should complete execution withot any errors', async () => {
+      const rootSeed = await transaction.bchjs.Mnemonic.toSeed(config.mnemonic)
+      const hdNode = transaction.bchjs.HDNode.fromSeed(rootSeed)
+
+      transaction.splitUtxosIntoStamps(mockData.utxosMock, hdNode)
+    })
+  })
 })

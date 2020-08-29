@@ -1,5 +1,4 @@
 const errorMessages = require('./errorMessages')
-const config = require('../../config')
 const BCHJS = require('@chris.troutner/bch-js')
 const BigNumber = require('bignumber.js')
 const { TransactionBuilder, ECSignature } = require('bitcoincashjs-lib')
@@ -98,76 +97,76 @@ class Transaction {
 
     return neededStamps
   }
-}
 
-const splitUtxosIntoStamps = (utxos, hdNode) => {
-  const transactionBuilder =
-        config.network === 'mainnet'
-          ? new bchjs.TransactionBuilder()
-          : new bchjs.TransactionBuilder('testnet')
+  splitUtxosIntoStamps (utxos, hdNode) {
+    const transactionBuilder =
+          this.config.network === 'mainnet'
+            ? new this.bchjs.TransactionBuilder()
+            : new this.bchjs.TransactionBuilder('testnet')
 
-  const originalAmount = utxos.reduce(
-    (accumulator, utxo) => accumulator + utxo.value,
-    0
-  )
-
-  const numberOfPossibleStamps =
-        originalAmount / (config.postageRate.weight + MIN_BYTES_INPUT)
-  const hypotheticalByteCount = bchjs.BitcoinCash.getByteCount(
-    { P2PKH: utxos.length },
-    { P2PKH: numberOfPossibleStamps }
-  )
-  const satoshisPerByte = 1.4
-  const hypotheticalTxFee = Math.floor(
-    satoshisPerByte * hypotheticalByteCount
-  )
-  let numberOfActualStamps =
-        (originalAmount - hypotheticalTxFee) /
-        (config.postageRate.weight + MIN_BYTES_INPUT)
-  if (numberOfActualStamps > 100) {
-    numberOfActualStamps = 50
-  }
-
-  utxos.forEach(utxo =>
-    transactionBuilder.addInput(utxo.tx_hash, utxo.tx_pos)
-  )
-  const keyPair = bchjs.HDNode.toKeyPair(hdNode)
-  const outputAddress = bchjs.HDNode.toCashAddress(hdNode)
-  const byteCount = bchjs.BitcoinCash.getByteCount(
-    { P2PKH: utxos.length },
-    { P2PKH: numberOfActualStamps }
-  )
-  const txFee = Math.floor(satoshisPerByte * byteCount)
-  const totalSatoshisToSend =
-        (config.postageRate.weight + MIN_BYTES_INPUT) * numberOfActualStamps
-
-  for (let i = 0; i < numberOfActualStamps; i++) {
-    transactionBuilder.addOutput(
-      outputAddress,
-      config.postageRate.weight + MIN_BYTES_INPUT
+    const originalAmount = utxos.reduce(
+      (accumulator, utxo) => accumulator + utxo.value,
+      0
     )
-  }
-  const change = originalAmount - totalSatoshisToSend - txFee
-  if (change > 1082) {
-    transactionBuilder.addOutput(outputAddress, change)
-  }
 
-  // Sign the transaction with the HD node.
-  let redeemScript
-  for (let i = 0; i < utxos.length; i++) {
-    transactionBuilder.sign(
-      i,
-      keyPair,
-      redeemScript,
-      transactionBuilder.hashTypes.SIGHASH_ALL,
-      utxos[i].value
+    const numberOfPossibleStamps =
+          originalAmount / (this.config.postageRate.weight + MIN_BYTES_INPUT)
+    const hypotheticalByteCount = this.bchjs.BitcoinCash.getByteCount(
+      { P2PKH: utxos.length },
+      { P2PKH: numberOfPossibleStamps }
     )
+    const satoshisPerByte = 1.4
+    const hypotheticalTxFee = Math.floor(
+      satoshisPerByte * hypotheticalByteCount
+    )
+    let numberOfActualStamps =
+          (originalAmount - hypotheticalTxFee) /
+          (this.config.postageRate.weight + MIN_BYTES_INPUT)
+    if (numberOfActualStamps > 100) {
+      numberOfActualStamps = 50
+    }
+
+    utxos.forEach(utxo =>
+      transactionBuilder.addInput(utxo.tx_hash, utxo.tx_pos)
+    )
+    const keyPair = this.bchjs.HDNode.toKeyPair(hdNode)
+    const outputAddress = this.bchjs.HDNode.toCashAddress(hdNode)
+    const byteCount = this.bchjs.BitcoinCash.getByteCount(
+      { P2PKH: utxos.length },
+      { P2PKH: numberOfActualStamps }
+    )
+    const txFee = Math.floor(satoshisPerByte * byteCount)
+    const totalSatoshisToSend =
+          (this.config.postageRate.weight + MIN_BYTES_INPUT) * numberOfActualStamps
+
+    for (let i = 0; i < numberOfActualStamps; i++) {
+      transactionBuilder.addOutput(
+        outputAddress,
+        this.config.postageRate.weight + MIN_BYTES_INPUT
+      )
+    }
+    const change = originalAmount - totalSatoshisToSend - txFee
+    if (change > 1082) {
+      transactionBuilder.addOutput(outputAddress, change)
+    }
+
+    // Sign the transaction with the HD node.
+    let redeemScript
+    for (let i = 0; i < utxos.length; i++) {
+      transactionBuilder.sign(
+        i,
+        keyPair,
+        redeemScript,
+        transactionBuilder.hashTypes.SIGHASH_ALL,
+        utxos[i].value
+      )
+    }
+
+    const tx = transactionBuilder.build()
+    const hex = tx.toHex()
+
+    return hex
   }
-
-  const tx = transactionBuilder.build()
-  const hex = tx.toHex()
-
-  return hex
 }
 
 const buildTransaction = (
@@ -191,6 +190,5 @@ const buildTransaction = (
 
 module.exports = {
   Transaction,
-  buildTransaction,
-  splitUtxosIntoStamps
+  buildTransaction
 }

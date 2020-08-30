@@ -2,7 +2,7 @@
 const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
-const { BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
+const { Transaction: BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
 const BCHJS = require('@chris.troutner/bch-js')
 
 // Local libraries.
@@ -10,10 +10,7 @@ const config = require('./config')
 const slpMiddleware = require('./src/lib/slpMiddleware')
 const errorMessages = require('./src/lib/errorMessages')
 
-const {
-  Transaction,
-  buildTransaction
-} = require('./src/lib/transaction')
+const Transaction = require('./src/lib/transaction')
 const transaction = new Transaction(config)
 
 const Network = require('./src/lib/network')
@@ -63,7 +60,7 @@ app.post('/postage', async function (req, res) {
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)
     )
-    const stampedTransaction = buildTransaction(
+    const stampedTransaction = transaction.buildTransaction(
       incomingTransaction,
       stamps,
       keyPair

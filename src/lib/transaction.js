@@ -167,28 +167,21 @@ class Transaction {
 
     return hex
   }
+
+  buildTransaction (incomingTransaction, stamps, keyPairFromPostOffice) {
+    const newTransaction = TransactionBuilder.fromTransaction(
+      incomingTransaction,
+      this.config.network
+    )
+    const newTransactionHex = this.addStampsForTransactionAndSignInputs(
+      newTransaction,
+      keyPairFromPostOffice,
+      stamps
+    )
+      .build()
+      .toHex()
+    return newTransactionHex
+  }
 }
 
-const buildTransaction = (
-  incomingTransaction,
-  stamps,
-  keyPairFromPostOffice
-) => {
-  const newTransaction = TransactionBuilder.fromTransaction(
-    incomingTransaction,
-    config.network
-  )
-  const newTransactionHex = addStampsForTransactionAndSignInputs(
-    newTransaction,
-    keyPairFromPostOffice,
-    stamps
-  )
-    .build()
-    .toHex()
-  return newTransactionHex
-}
-
-module.exports = {
-  Transaction,
-  buildTransaction
-}
+module.exports = Transaction

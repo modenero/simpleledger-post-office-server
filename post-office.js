@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
 
-const { BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
+const { Transaction } = require('bitcoincashjs-lib')
 const BCHJS = require('@psf/bch-js')
 
 // Local libraries.
@@ -11,8 +11,8 @@ const config = require('./config')
 const slpMiddleware = require('./src/lib/slpMiddleware')
 const errorMessages = require('./src/lib/errorMessages')
 
-const Transaction = require('./src/lib/transaction')
-const transaction = new Transaction(config)
+const TransactionLib = require('./src/lib/transaction')
+const transaction = new TransactionLib(config)
 
 const Network = require('./src/lib/network')
 const network = new Network()
@@ -52,9 +52,12 @@ app.post('/postage', async function (req, res) {
     const hdNode = bchjs.HDNode.fromSeed(rootSeed)
     const keyPair = bchjs.HDNode.toKeyPair(hdNode)
     const payment = PaymentProtocol.Payment.decode(req.raw)
-    const incomingTransaction = BitcoinCashJSTransaction.fromHex(
+
+    // Convert the tx hex into a JS object representing the transaction.
+    const incomingTransaction = Transaction.fromHex(
       payment.transactions[0].toString('hex')
     )
+
     await network.validateSLPInputs(incomingTransaction.ins)
     const neededStampsForTransaction = transaction.getNeededStamps(
       incomingTransaction

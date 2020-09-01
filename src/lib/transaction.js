@@ -1,5 +1,8 @@
 const errorMessages = require('./errorMessages')
-const BCHJS = require('@chris.troutner/bch-js')
+
+// const config = require('../../config')
+const BCHJS = require('@psf/bch-js')
+
 const BigNumber = require('bignumber.js')
 const { TransactionBuilder, ECSignature } = require('bitcoincashjs-lib')
 
@@ -22,7 +25,11 @@ class Transaction {
     this.bchjs = bchjs
   }
 
-  addStampsForTransactionAndSignInputs (transaction, keyPairFromPostOffice, stamps) {
+  addStampsForTransactionAndSignInputs (
+    transaction,
+    keyPairFromPostOffice,
+    stamps
+  ) {
     const lastSlpInputVin = transaction.inputs.length - 1
     for (let i = 0; i < stamps.length; i++) {
       transaction.addInput(stamps[i].tx_hash, stamps[i].tx_pos)
@@ -90,11 +97,11 @@ class Transaction {
     // Check if postage is being paid accordingly
     const postagePaymentTokenId = transactionScript[TOKEN_ID_INDEX]
     const stampDetails =
-          this.config.postageRate.stamps
-            .filter(stamp => stamp.tokenId === postagePaymentTokenId)
-            .pop() || false
+            this.config.postageRate.stamps
+              .filter(stamp => stamp.tokenId === postagePaymentTokenId)
+              .pop() || false
     const minimumStampsNeeded =
-          transaction.outs.length - transaction.ins.length + 1
+            transaction.outs.length - transaction.ins.length + 1
 
     if (stampDetails) {
       const stampRate = new BigNumber(stampDetails.rate).times(
@@ -107,11 +114,15 @@ class Transaction {
       ).times(10 ** stampDetails.decimals)
 
       if (
-        amountPostagePaid.isLessThan(stampRate.times(minimumStampsNeeded))
+        amountPostagePaid.isLessThan(
+          stampRate.times(minimumStampsNeeded)
+        )
       ) {
         throw new Error(errorMessages.INSUFFICIENT_POSTAGE)
       }
-      neededStamps = Number(amountPostagePaid.dividedBy(stampRate).toFixed(0))
+      neededStamps = Number(
+        amountPostagePaid.dividedBy(stampRate).toFixed(0)
+      )
     } else {
       throw new Error(errorMessages.UNSUPPORTED_SLP_TOKEN)
     }
@@ -121,9 +132,9 @@ class Transaction {
 
   splitUtxosIntoStamps (utxos, hdNode) {
     const transactionBuilder =
-          this.config.network === 'mainnet'
-            ? new this.bchjs.TransactionBuilder()
-            : new this.bchjs.TransactionBuilder('testnet')
+            this.config.network === 'mainnet'
+              ? new this.bchjs.TransactionBuilder()
+              : new this.bchjs.TransactionBuilder('testnet')
 
     const originalAmount = utxos.reduce(
       (accumulator, utxo) => accumulator + utxo.value,
@@ -131,7 +142,7 @@ class Transaction {
     )
 
     const numberOfPossibleStamps =
-          originalAmount / (this.config.postageRate.weight + MIN_BYTES_INPUT)
+            originalAmount / (this.config.postageRate.weight + MIN_BYTES_INPUT)
     const hypotheticalByteCount = this.bchjs.BitcoinCash.getByteCount(
       { P2PKH: utxos.length },
       { P2PKH: numberOfPossibleStamps }
@@ -141,8 +152,8 @@ class Transaction {
       satoshisPerByte * hypotheticalByteCount
     )
     let numberOfActualStamps =
-          (originalAmount - hypotheticalTxFee) /
-          (this.config.postageRate.weight + MIN_BYTES_INPUT)
+            (originalAmount - hypotheticalTxFee) /
+            (this.config.postageRate.weight + MIN_BYTES_INPUT)
     if (numberOfActualStamps > 100) {
       numberOfActualStamps = 50
     }
@@ -158,7 +169,8 @@ class Transaction {
     )
     const txFee = Math.floor(satoshisPerByte * byteCount)
     const totalSatoshisToSend =
-          (this.config.postageRate.weight + MIN_BYTES_INPUT) * numberOfActualStamps
+            (this.config.postageRate.weight + MIN_BYTES_INPUT) *
+            numberOfActualStamps
 
     for (let i = 0; i < numberOfActualStamps; i++) {
       transactionBuilder.addOutput(

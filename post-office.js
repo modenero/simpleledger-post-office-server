@@ -2,8 +2,9 @@
 const express = require('express')
 const cors = require('cors')
 const PaymentProtocol = require('bitcore-payment-protocol')
-const { Transaction: BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
-const BCHJS = require('@chris.troutner/bch-js')
+
+const { BitcoinCashJSTransaction } = require('bitcoincashjs-lib')
+const BCHJS = require('@psf/bch-js')
 
 // Local libraries.
 const config = require('./config')
@@ -55,7 +56,9 @@ app.post('/postage', async function (req, res) {
       payment.transactions[0].toString('hex')
     )
     await network.validateSLPInputs(incomingTransaction.ins)
-    const neededStampsForTransaction = transaction.getNeededStamps(incomingTransaction)
+    const neededStampsForTransaction = transaction.getNeededStamps(
+      incomingTransaction
+    )
     const stamps = await network.fetchUTXOsForNumberOfStampsNeeded(
       neededStampsForTransaction,
       bchjs.HDNode.toCashAddress(hdNode)
@@ -65,7 +68,9 @@ app.post('/postage', async function (req, res) {
       stamps,
       keyPair
     )
-    const transactionId = await network.broadcastTransaction(stampedTransaction)
+    const transactionId = await network.broadcastTransaction(
+      stampedTransaction
+    )
     const memo = `Transaction Broadcasted: https://explorer.bitcoin.com/bch/tx/${transactionId}`
     payment.transactions[0] = stampedTransaction
     const paymentAck = paymentProtocol.makePaymentACK(
@@ -92,8 +97,14 @@ app.listen(3000, async () => {
   const generateStamps = async () => {
     console.log('Generating stamps...')
     try {
-      const utxosToSplit = await network.fetchUTXOsForStampGeneration(cashAddress)
-      const splitTransaction = transaction.splitUtxosIntoStamps(utxosToSplit, hdNode)
+      const utxosToSplit = await network.fetchUTXOsForStampGeneration(
+        cashAddress
+      )
+      const splitTransaction = transaction.splitUtxosIntoStamps(
+        utxosToSplit,
+        hdNode
+      )
+
       await network.broadcastTransaction(splitTransaction)
     } catch (e) {
       console.error(e.message || e.error || e)

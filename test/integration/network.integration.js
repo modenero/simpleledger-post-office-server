@@ -60,7 +60,7 @@ describe('#network.js', () => {
     it('should throw and error if there are not enough stamps', async () => {
       try {
         const addr =
-                  'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
+                    'bitcoincash:qzs02v05l7qs5s24srqju498qu55dwuj0cx5ehjm2c'
 
         await uut.fetchUTXOsForNumberOfStampsNeeded(2, addr)
 
@@ -102,10 +102,7 @@ describe('#network.js', () => {
         assert.equal(true, false, 'Unexpected result!')
       } catch (err) {
         // console.log('err: ', err)
-        assert.include(
-          err.message,
-          'Invalid Payment'
-        )
+        assert.include(err.message, 'Invalid Payment')
       }
     })
   })

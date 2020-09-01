@@ -1,5 +1,5 @@
 const errorMessages = require('./errorMessages')
-const BCHJS = require('@chris.troutner/bch-js')
+const BCHJS = require('@psf/bch-js')
 const config = require('../../config')
 
 const bchjs = new BCHJS({

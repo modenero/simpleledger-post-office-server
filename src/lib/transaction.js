@@ -44,26 +44,44 @@ class Transaction {
     return transaction
   }
 
+  // Get the stamps needed to complete the transaction.
+  // Expects a JS object expressing a transaction.
+  // Returns the number of stamps needed to complete the transaction.
   getNeededStamps (transaction) {
+    // Configure the BigNumber library to round up.
     BigNumber.set({ ROUNDING_MODE: BigNumber.ROUND_UP })
+
+    // Get the OP_RETURN output
     const transactionScript = this.bchjs.Script.toASM(
       transaction.outs[SLP_OP_RETURN_VOUT].script
     ).split(' ')
+
+    // Ensure the Lokad ID exists in the OP_RETURN. Sanity check that it's a
+    // SLP transaction.
     if (transactionScript[LOKAD_ID_INDEX] !== LOKAD_ID_INDEX_VALUE) {
       throw new Error(errorMessages.INVALID_SLP_OP_RETURN)
     }
 
     let neededStamps = 0
     let tokenOutputPostage = 0
+
+    // Loop through each transaction output.
     for (let i = 1; i < transaction.outs.length; i++) {
+      // Get the SLP address in this output of the transaction.
       const addressFromOut = this.bchjs.SLP.Address.toSLPAddress(
         this.bchjs.Address.fromOutputScript(transaction.outs[i].script)
       )
+
+      // Get the post office address.
       const postOfficeAddress = this.config.postageRate.address
+
+      // If the addresses match...?
       if (postOfficeAddress === addressFromOut) {
         tokenOutputPostage = TOKEN_ID_INDEX + i
       }
     }
+
+    // If no postage was added, throw an error.
     if (tokenOutputPostage === 0) {
       throw new Error(errorMessages.INSUFFICIENT_POSTAGE)
     }
@@ -77,14 +95,17 @@ class Transaction {
             .pop() || false
     const minimumStampsNeeded =
           transaction.outs.length - transaction.ins.length + 1
+
     if (stampDetails) {
       const stampRate = new BigNumber(stampDetails.rate).times(
         10 ** stampDetails.decimals
       )
+
       const amountPostagePaid = new BigNumber(
         transactionScript[tokenOutputPostage],
         16
       ).times(10 ** stampDetails.decimals)
+
       if (
         amountPostagePaid.isLessThan(stampRate.times(minimumStampsNeeded))
       ) {

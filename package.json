@@ -1,7 +1,7 @@
 {
     "name": "simpleledger-post-office-server",
-    "version": "1.0.0",
-    "description": "PSF fork of the SLP Post Office Server",
+    "version": "20.11.16",
+    "description": "Cash DevOps fork of the SLP Post Office Server",
     "main": "post-office.js",
     "scripts": {
         "start": "node post-office.js",
@@ -24,15 +24,12 @@
         "office",
         "tokens"
     ],
-    "author": "Chris Troutner <chris.troutner@gmail.com>",
+    "author": "Bitcoin Please <support@bchplease.org>",
     "contributors": [
-        "Andre Cabrera (andrecabrera@protonmail.ch)"
+        "Andre Cabrera (andrecabrera@protonmail.ch)",
+        "Chris Troutner <chris.troutner@gmail.com>"
     ],
     "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/Permissionless-Software-Foundation/simpleledger-post-office-server/issues"
-    },
-    "homepage": "https://github.com/Permissionless-Software-Foundation/simpleledger-post-office-server#readme",
     "dependencies": {
         "@psf/bch-js": "^3.5.5",
         "bignumber.js": "^9.0.0",
